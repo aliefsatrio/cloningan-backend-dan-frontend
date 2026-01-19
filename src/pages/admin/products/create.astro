@@ -1,0 +1,61 @@
+---
+import DashboardLayout from "../../../layouts/dashboardLayout.astro";
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+
+  const body = {
+    PRODUCT_NAME: formData.get("PRODUCT_NAME"),
+    PRICE: Number(formData.get("PRICE")),
+    STOCK: Number(formData.get("STOCK")),
+  };
+
+  await fetch("http://localhost:3000/products", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  return Astro.redirect("/admin/products");
+}
+---
+
+<DashboardLayout>
+  <h2 class="text-2xl font-bold mb-4">Tambah Produk Mainan</h2>
+
+  <form method="POST" class="flex flex-col gap-3 max-w-md">
+    <div>
+      <label>Nama Produk</label>
+      <input
+        type="text"
+        name="PRODUCT_NAME"
+        required
+        class="border p-2 w-full"
+      />
+    </div>
+
+    <div>
+      <label>Harga</label>
+      <input
+        type="number"
+        name="PRICE"
+        required
+        class="border p-2 w-full"
+      />
+    </div>
+
+    <div>
+      <label>Stok</label>
+      <input
+        type="number"
+        name="STOCK"
+        required
+        class="border p-2 w-full"
+      />
+    </div>
+
+    <button class="bg-amber-700 text-white p-2 rounded">
+      Simpan
+    </button>
+  </form>
+</DashboardLayout>

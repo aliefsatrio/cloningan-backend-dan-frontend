@@ -1,0 +1,39 @@
+---
+import DashboardLayout from "../../../../layouts/dashboardLayout.astro";
+
+const {id} = Astro.params;
+const data = await fetch(`http://localhost:3000/categories/${id}`)
+const category = await data.json();
+
+if(Astro.request.method === "POST"){
+    const fromData = await Astro.request.formData()
+    const body = Object.fromEntries(fromData);
+
+    await fetch(`http://localhost:3000/categories/${id}`, {
+        method:"PUT",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(body)
+    })
+
+     return Astro.redirect("/admin/categories")
+}
+---
+
+<DashboardLayout>
+    <h2>Edit data category</h2>
+
+    <form method="post">
+        <div>
+            <label for="name">NAMA</label>
+            <input
+                type="text"
+                name="CATEGORY"
+                value={category.CATEGORY}
+                placeholder="Input Nama"
+                />
+        </div>
+        <div>
+            <button type="submit">Update</button>
+        </div>
+    </form>
+</DashboardLayout>

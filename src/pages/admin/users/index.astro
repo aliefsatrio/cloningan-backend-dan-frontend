@@ -1,0 +1,152 @@
+---
+import DashboardLayout from "../../../layouts/dashboardLayout.astro";
+
+/* =====================
+   TYPE DEFINITIONS
+===================== */
+type Transaction = {
+  ORDER_ID: number;
+  ORDER_DATE: string;
+  CUST_NAME: string;
+  USERNAME: string;
+  METHOD: string;
+  TOTAL: number;
+};
+
+type OrderItem = {
+  PRODUCT_NAME: string;
+  QTY: number;
+  PRICE: number;
+};
+
+/* =====================
+   GET QUERY PARAM
+===================== */
+const url = new URL(Astro.request.url);
+const selectedId = url.searchParams.get("order_id");
+
+/* =====================
+   FETCH LIST TRANSAKSI
+===================== */
+const listRes = await fetch("http://localhost:3000/users");
+const listJson = await listRes.json();
+const users: Transaction[] = Array.isArray(listJson.data)
+  ? listJson.data
+  : [];
+
+/* =====================
+   FETCH DETAIL TRANSAKSI
+===================== */
+let detailOrder: Transaction | null = null;
+let detailItems: OrderItem[] = [];
+
+if (selectedId) {
+  const detailRes = await fetch(
+    `http://localhost:3000/users/${selectedId}`
+  );
+  const detailJson = await detailRes.json();
+
+  detailOrder = detailJson.order;
+  detailItems = Array.isArray(detailJson.items)
+    ? detailJson.items
+    : [];
+}
+---
+
+<DashboardLayout>
+  <h2 class="text-2xl font-bold mb-4">Transaksi Customer
+    <p class="text-sm text-gray-500">
+    DEBUG order_id: {selectedId}
+</p>
+
+  </h2>
+
+  <!-- =====================
+       TABEL TRANSAKSI
+  ====================== -->
+  <table class="w-full border">
+    <thead class="bg-gray-200">
+      <tr>
+        <th>No</th>
+        <th>ID Transaksi</th>
+        <th>Customer</th>
+        <th>Tanggal</th>
+        <th>Kasir</th>
+        <th>Metode</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {users.map((trx: any, index: number) => (
+        <tr class="border-b hover:bg-gray-100">
+          <td>{index + 1}</td>
+
+          <!-- LINK KE DETAIL -->
+          <td>
+            <a
+              href={`/admin/users/${trx.ORDER_ID}`}
+              class="text-blue-600 underline"
+            >
+              {trx.ORDER_ID}
+            </a>
+          </td>
+
+          <td>{trx.CUST_NAME}</td>
+          <td>{new Date(trx.ORDER_DATE).toLocaleString()}</td>
+          <td>{trx.USERNAME}</td>
+          <td>{trx.METHOD}</td>
+          <td>Rp {Number(trx.TOTAL).toLocaleString()}</td>
+        </tr>
+      ))}
+    </tbody>
+
+  </table>
+
+  <!-- =====================
+       DETAIL TRANSAKSI
+  ====================== -->
+  {detailOrder && (
+    <div class="mt-8 bg-white p-6 rounded shadow">
+      <h3 class="text-xl font-bold mb-4">Detail Transaksi</h3>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <p><b>ID Transaksi:</b> {detailOrder.ORDER_ID}</p>
+        <p>
+          <b>Tanggal:</b>{" "}
+          {new Date(detailOrder.ORDER_DATE).toLocaleString()}
+        </p>
+        <p><b>Customer:</b> {detailOrder.CUST_NAME}</p>
+        <p><b>Kasir:</b> {detailOrder.USERNAME}</p>
+        <p><b>Metode Pembayaran:</b> {detailOrder.METHOD}</p>
+        <p>
+          <b>Total:</b>{" "}
+          Rp.{Number(detailOrder.TOTAL).toLocaleString()}
+        </p>
+      </div>
+
+      <table class="w-full border">
+        <thead class="bg-gray-200">
+          <tr>
+            <th>Produk</th>
+            <th>Harga</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {detailItems.map((item: OrderItem) => (
+            <tr class="border-b">
+              <td>{item.PRODUCT_NAME}</td>
+              <td>Rp.{item.PRICE.toLocaleString()}</td>
+              <td>{item.QTY}</td>
+              <td>
+                Rp.{(item.PRICE * item.QTY).toLocaleString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</DashboardLayout>

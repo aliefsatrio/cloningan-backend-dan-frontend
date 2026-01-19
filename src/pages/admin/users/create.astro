@@ -1,0 +1,44 @@
+---
+import DashboardLayout from "../../../layouts/dashboardLayout.astro";
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const body = Object.fromEntries(formData);
+
+  await fetch("http://localhost:3000/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  return Astro.redirect("/admin/users");
+}
+---
+
+<DashboardLayout>
+  <h2>Buat Data Users</h2>
+
+  <form method="post">
+    <div>
+      <label>Nama</label>
+      <input
+        type="text"
+        name="name"
+        placeholder="Input Nama"
+        required
+      />
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="Input Email"
+        required
+      />
+    </div>
+
+    <button type="submit">Create</button>
+  </form>
+</DashboardLayout>

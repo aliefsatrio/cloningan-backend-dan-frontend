@@ -1,0 +1,32 @@
+---
+import { astroCalledServerError } from "astro:actions";
+import DashboardLayout from "../../../layouts/dashboardLayout.astro";
+
+if(Astro.request.method === "POST"){
+    const formData = await Astro.request.formData();
+    const body = Object.fromEntries(formData);
+
+    await fetch("http://localhost:3000/categories",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(body)
+    })
+    return Astro.redirect("/admin/categories")
+}
+---
+
+<DashboardLayout>
+    <h2>Buat Data Category</h2>
+
+    <form method="POST">
+        <div>
+            <label for="name">Nama</label>
+            <input type="text" name="CATEGORY" placeholder="Input Nama">
+            <label for="Category">Category</label>
+            <input type="text" name="CATEGORY_ID" placeholder="Input Category">
+        </div>
+        <div>
+            <button type="submit">Simpan</button>
+        </div>
+    </form>
+</DashboardLayout>

@@ -1,0 +1,38 @@
+---
+import DashboardLayout from "../layouts/dashboardLayout.astro";
+import FrontendLayout from "../layouts/FrontendLayout.astro";
+
+const data = await fetch(`http://localhost:3000/categories`)
+const categories = await data.json()
+
+const dataProducts = await fetch(`http://localhost:3000/products`)
+const products = await dataProducts.json()
+---
+
+<FrontendLayout>
+
+	<h2 class="container max-auto py-10">ini adalah dashboard</h2>
+	<div class="flex gap-4">
+			{
+				categories.map((cat:any) =>{
+					<div class="border border-gray-500 rounded-2xl p-3">
+						<h3>{cat.name}</h3>
+					</div>
+				})
+			}
+	</div>
+	
+	<div class="container max-auto py-10">
+		<h2>Product</h2>
+		<div class="grid grid-cols-4">
+			{
+				products.map((p:any) => {
+					<div class="p-3 border border-gray-500 rounded-2xl">
+						<h3>{p.name}</h3>
+						<h3>{p.price}</h3>
+					</div>
+				})
+			}
+		</div>
+	</div>
+</FrontendLayout>
